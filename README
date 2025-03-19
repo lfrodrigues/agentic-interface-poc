@@ -1,0 +1,29 @@
+# INSTALL BACKEND 
+
+$ python3 -m venv venv 
+
+$ source venv/bin/activate
+
+$ pip install uv
+
+$ uv pip install -r agent/requirements.txt
+
+$ cd agent 
+
+$ cp agno2/.env_template  agno2/.env
+
+Fill in the .env file with the correct credentials
+
+$ ./manage.py migrate
+
+$ ./manage.py runserver 0.0.0.0:8000
+
+# INSTALL FRONTEND
+
+cd mobile-app/
+
+npm install
+
+npm run android
+
+
