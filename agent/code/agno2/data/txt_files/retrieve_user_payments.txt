@@ -1,0 +1,9 @@
+Process Name: Retrieve user credit card details
+
+1. Request user identification
+   - Request user's phone number for account identification
+   - Accept customer identifier: phone number
+   - Validate input format and existence in the backend system by using the provided tool validate_phone_number
+ 
+ 
+2. Return available cards from database    

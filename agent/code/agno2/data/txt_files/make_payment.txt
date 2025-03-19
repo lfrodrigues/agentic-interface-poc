@@ -1,0 +1,18 @@
+Process Name: Pay an invoice
+
+1. Request user identification
+   - Request user's phone number for account identification
+   - Accept customer identifier: phone number
+   - Validate input format and existence in the backend system by using the provided tool validate_phone_number
+ 
+ 
+2. Ensure there's an unpaid invoice 
+
+3. Ensure there are cards registered methods
+    - Query main payment system for available cards 
+    - If there are no registered cards method ask user the full card details
+    - Store the card number and expiration date in the database 
+
+3. Pay the invoice
+    - Call the process payment system with the card identification and invoice number
+

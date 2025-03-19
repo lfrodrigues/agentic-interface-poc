@@ -1,0 +1,16 @@
+Process Name: Change Package Bundle
+
+1. Request user identification
+   - Request user's phone number for account identification
+   - Accept customer identifier: phone number
+   - Validate input format and existence in the backend system by using the provided tool validate_phone_number
+ 
+2. Check if user has any active invoices, if they do, force user to pay 
+
+3. If there are no invoices to be paid, search for available packages in the telco system
+
+4. Display packages to the user 
+
+5. User should pick only one package  
+
+6. Update the database with the latest package

@@ -1,0 +1,16 @@
+Process Name: Retrieve Telco Availlable Credit Information
+
+1. Request user identification
+   - Request user's phone number for account identification
+   - Accept customer identifier: phone number
+   - Validate input format and existence in the backend system by using the provided tool validate_phone_number
+ 
+
+2. Data Retrieval Steps
+    - Query main billing system for current credit balance
+    - Verify account status (active/suspended)
+    - Retrieve available credit
+
+3. Response Format
+   - Current available credit
+   - Last update timestamp
