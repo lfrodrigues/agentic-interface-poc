@@ -1,13 +1,15 @@
-import { Image, StyleSheet, Platform, Button, View } from 'react-native';
-import { useState } from 'react';
+import "../global.css"
+import { Image, StyleSheet, Platform, Button, Pressable } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { TextInput } from 'react-native';
+import { View, AnimatePresence } from 'moti';
+import { useEffect, useState } from 'react';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DynamicComponentRenderer from '@/components/DynamicComponentRenderer';
+import AnimatedGradient from "@/components/ui/AnimatedGradient";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Text from "@/components/ui/Text";
+import { Feather } from '@expo/vector-icons';
 
 interface ComponentData {
   // Add any specific properties your dynamic components expect
@@ -22,11 +24,18 @@ export default function HomeScreen() {
 
   const [uiData, setUiData] = useState<ComponentData | string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const insets = useSafeAreaInsets();
+
+
+const reset = ()=>{
+  setUiData('');
+}
 
   const fetchDataFromAPI = async () => {
     try {
+
       setIsLoading(true);
-      const response = await fetch('http://10.0.2.2:8000/api/', {
+      const response = await fetch('https://fd30-83-110-100-187.ngrok-free.app/api/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,11 +46,12 @@ export default function HomeScreen() {
         })
       });
       const data = await response.json();
-      
+
       // Reset state before setting new UI data
       formData = {};
       sessionId = data.session_id;
-      
+
+      console.log(data.message);
       // Use a slight delay to ensure proper re-rendering
       // This forces React to see the component as "new" even if structure is similar
       setUiData('');
@@ -49,6 +59,7 @@ export default function HomeScreen() {
         setUiData(data.message);
       }, 10);
     } catch (error) {
+      console.log('ERROR')
       console.error('Error fetching UI data:', error);
       setUiData('');
     } finally {
@@ -66,21 +77,21 @@ export default function HomeScreen() {
     setIsLoading(true);
     try {
       console.log('will handleSubmit with data', formData);
-      const response = await fetch('http://10.0.2.2:8000/api/', {
+      const response = await fetch('https://fd30-83-110-100-187.ngrok-free.app/api/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            session_id: sessionId,
-            message: JSON.stringify(formData)
-          })
+          session_id: sessionId,
+          message: JSON.stringify(formData)
+        })
       });
       const data = await response.json();
-      
+
       // Reset form data
       formData = {};
-      
+
       // Force re-render with empty state briefly to clean the component tree and 
       // ensure state is reset
       setUiData('');
@@ -95,78 +106,128 @@ export default function HomeScreen() {
   };
 
 
+
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
+    <View className="flex-1">
 
-      <ThemedView style={styles.timeContainer}>   
-        <Button 
-          title={isLoading ? "Loading..." : "Get Dynamic UI"} 
-          onPress={fetchDataFromAPI}
-          disabled={isLoading}
-        />
-      </ThemedView>
 
-      <DynamicComponentRenderer 
-        componentData={uiData} 
-        parentProps={{ 
-          storeData,
-          handleSubmit
-          // Add any other functions or props you want to make available to dynamic components
-        }} 
-        />
+      <View className="absolute left-0 top-0 h-full w-full  ">
+        <AnimatedGradient />
+      </View>
 
-    </ParallaxScrollView>
+      <SafeAreaView className="flex-1 relative z-10">
+
+        <AnimatePresence exitBeforeEnter>
+
+          {
+            (Boolean(uiData) && !isLoading) &&
+            <View className="p-6 flex-1 items-stretch gap-4  flex justify-center" key="main"
+              from={{
+                opacity: 0,
+                scale: 1,
+                translateY: 10,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                translateY: 0
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.9,
+                translateY: 0
+              }}
+            >
+              <View
+               className='bg-white/10 p-6 rounded-lg'>
+              <DynamicComponentRenderer
+                componentData={uiData}
+                parentProps={{
+                  storeData,
+                  handleSubmit
+                  // Add any other functions or props you want to make available to dynamic components
+                }}
+              />
+              </View>
+            </View>
+          }
+
+          {
+            (!Boolean(uiData) && !isLoading) &&
+            <View className="p-6 flex-1 justify-center" key="initial"
+              from={{
+                opacity: 0,
+                scale: 1,
+                translateY: 10,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                translateY: 0
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.9,
+                translateY: 0
+              }}
+            >
+
+              <View className="flex gap-2">
+                <Text className="text-2xl text-white font-light">Welcome to</Text>
+                <Text className="text-4xl text-white font-light"><Text className="font-semibold">Adabtive</Text> Interface</Text>
+
+              </View>
+
+            </View>
+          }
+
+
+
+
+          {
+            !isLoading &&
+
+            <View key='action-button' className="w-full absolute bottom-0 p-6 items-center justify-center" style={{ marginBottom: insets.bottom }}
+              from={{
+                opacity: 0,
+                //scale: 1,
+                translateY: 20,
+              }}
+              animate={{
+                opacity: 1,
+                //scale: 1,
+                translateY: 0
+              }}
+              exit={{
+                opacity: 0,
+                //scale: 0.9,
+                translateY: 20
+              }}
+            >
+              <Pressable
+                onPress={uiData? reset:fetchDataFromAPI}
+                //onPress={() => { setIsLoading(!isLoading) }}
+                //disabled={isLoading}
+                className="bg-white/20 w-full items-center justify-center p-1 rounded-full flex-row w-80"
+              >
+
+
+                <View className="flex-1 items-center p-4">
+                  <Text className="text-white text-lg">{uiData? 'Start Over':'Start'}</Text>
+                </View>
+
+                {/* <View className="bg-white/60 rounded-full p-4">
+                  <Feather name="arrow-right" color="#292929" size={20} />
+                </View> */}
+              </Pressable>
+            </View>
+          }
+
+        </AnimatePresence>
+      </SafeAreaView>
+
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-  timeContainer: {
-    alignItems: 'center',
-    marginVertical: 20,
-    gap: 10,
-  },
-  dynamicContainer: {
-    marginVertical: 20,
-    padding: 10,
-  },
-  timeText: {
-    fontSize: 18,
-    marginTop: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-    width: '100%',
-    maxWidth: 300,
-  },
-}) 

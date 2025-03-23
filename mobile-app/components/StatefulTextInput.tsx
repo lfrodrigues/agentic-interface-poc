@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import TextInput from './ui/TextInput';
 import { TextInputProps } from 'react-native';
-import { ThemedTextInput, ThemedTextInputProps } from './ThemedTextInput';
 
-interface StatefulTextInputProps extends Omit<ThemedTextInputProps, 'onChangeText'> {
+interface StatefulTextInputProps extends Omit<TextInputProps, 'onChangeText'> {
   initialValue?: string;
   onValueChange?: (value: string) => void;
   onChangeText?: ((text: string) => void) | string;
@@ -38,7 +38,7 @@ const StatefulTextInput: React.FC<StatefulTextInputProps> = ({
   };
 
   return (
-    <ThemedTextInput
+    <TextInput
       {...props}
       value={value}
       onChangeText={handleChangeText}

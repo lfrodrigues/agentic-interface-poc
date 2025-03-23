@@ -1,8 +1,9 @@
 import React from 'react';
-import { Text, View, Button, Image, TouchableOpacity, TextInput } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { View, Image, TouchableOpacity, TextInput } from 'react-native';
+
 import StatefulTextInput from '@/components/StatefulTextInput';
+import Text from "@/components/ui/Text";
+import Button from "@/components/ui/Button";
 
 // Define the component map type
 type ComponentMapType = {
@@ -24,8 +25,8 @@ interface DynamicComponentRendererProps {
 
 // Map of component types to actual React Native components
 const ComponentMap: ComponentMapType = {
-  View: ThemedView,
-  Text: ThemedText,
+  View: View,
+  Text: Text,
   Button: Button,
   Image: Image,
   TextInput: StatefulTextInput,
@@ -48,7 +49,7 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ com
   
   // Handle string content directly
   if (typeof componentData === 'string') {
-    return <ThemedText>{componentData}</ThemedText>;
+    return <Text className='text-white text-2xl'>{componentData}</Text>;
   }
   
   const { type, props = {}, children } = componentData;
@@ -76,15 +77,21 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ com
   
   // Render component with children
   return (
-    <Component {...mergedProps}>
+    <Component  {...mergedProps}>
       {Array.isArray(children) 
-        ? children.map((child, index) => (
-            <DynamicComponentRenderer 
+        ? 
+        <View className='flex w-full items-strech gap-8'>
+        {children.map((child, index) => (
+            
+              <DynamicComponentRenderer 
               key={index} 
               componentData={child} 
               parentProps={parentProps} 
             />
+          
           ))
+        }
+        </View>
         : children 
           ? <DynamicComponentRenderer 
               componentData={children} 
