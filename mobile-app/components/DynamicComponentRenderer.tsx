@@ -49,7 +49,7 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ com
   
   // Handle string content directly
   if (typeof componentData === 'string') {
-    return <Text className='text-white text-2xl'>{componentData}</Text>;
+    return <Text className='text-white text-lg'>{componentData}</Text>;
   }
   
   const { type, props = {}, children } = componentData;
@@ -80,7 +80,7 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ com
     <Component  {...mergedProps}>
       {Array.isArray(children) 
         ? 
-        <View className='flex w-full items-strech gap-8'>
+        <View className='flex w-full items-strech gap-4'>
         {children.map((child, index) => (
             
               <DynamicComponentRenderer 

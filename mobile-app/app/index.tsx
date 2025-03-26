@@ -1,8 +1,8 @@
 import "../global.css"
-import { Image, StyleSheet, Platform, Button, Pressable } from 'react-native';
+import {  Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 
 import { View, AnimatePresence } from 'moti';
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DynamicComponentRenderer from '@/components/DynamicComponentRenderer';
@@ -27,6 +27,7 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const insets = useSafeAreaInsets();
 
+const { height } = useWindowDimensions();
 
 const reset = ()=>{
   setUiData('');
@@ -114,146 +115,152 @@ const reset = ()=>{
       
       
 
-      <View className="absolute left-0 top-0 h-full w-full  ">
+      <View className="absolute" style={StyleSheet.absoluteFill}>
         <AnimatedGradient />
       </View>
 
-      <SafeAreaView className="flex-1 relative z-10">
+      <View className="flex-1 relative z-10" style={StyleSheet.absoluteFill}>
+
+<ScrollView className="flex flex-1 ">
+
+<View className="" style={{minHeight: height}}>
 
 
-        <AnimatePresence exitBeforeEnter>
+<AnimatePresence exitBeforeEnter>
 
-          {
-            (Boolean(uiData) && !isLoading) &&
-            <View className="p-6 flex-1 items-stretch gap-4  flex justify-center" key="main"
-              from={{
-                opacity: 0,
-                scale: 1,
-                translateY: 10,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                translateY: 0
-              }}
-              exit={{
-                opacity: 0,
-                scale: 0.9,
-                translateY: 0
-              }}
-            >
-              <View
-               className='bg-white/10 p-6 rounded-lg'>
-              <DynamicComponentRenderer
-                componentData={uiData}
-                parentProps={{
-                  storeData,
-                  handleSubmit
-                  // Add any other functions or props you want to make available to dynamic components
-                }}
-              />
-              </View>
-            </View>
-          }
+{
+  (Boolean(uiData) && !isLoading) &&
+  <View className="p-6 flex-1 items-stretch gap-4 pb-52 flex justify-center" key="main"
+    from={{
+      opacity: 0,
+      scale: 1,
+      translateY: 10,
+    }}
+    animate={{
+      opacity: 1,
+      scale: 1,
+      translateY: 0
+    }}
+    exit={{
+      opacity: 0,
+      scale: 0.9,
+      translateY: 0
+    }}
+  >
+    <View
+     className='bg-white/10 p-6 rounded-lg'>
+    <DynamicComponentRenderer
+      componentData={uiData}
+      parentProps={{
+        storeData,
+        handleSubmit
+        // Add any other functions or props you want to make available to dynamic components
+      }}
+    />
+    </View>
+  </View>
+}
 
-          {
-            (!Boolean(uiData) && !isLoading) &&
-            <View className="p-6 flex-1 justify-center" key="initial"
-              from={{
-                opacity: 0,
-                scale: 1,
-                translateY: 10,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                translateY: 0
-              }}
-              exit={{
-                opacity: 0,
-                scale: 0.9,
-                translateY: 0
-              }}
-            >
+{
+  (!Boolean(uiData) && !isLoading) &&
+  <View className="p-6 flex-1 justify-center" key="initial"
+    from={{
+      opacity: 0,
+      scale: 1,
+      translateY: 10,
+    }}
+    animate={{
+      opacity: 1,
+      scale: 1,
+      translateY: 0
+    }}
+    exit={{
+      opacity: 0,
+      scale: 0.9,
+      translateY: 0
+    }}
+  >
 
-              <View className="flex gap-2">
-                <Text className="text-2xl text-white font-light">Welcome to</Text>
-                <Text className="text-4xl text-white font-light"><Text className="font-semibold">Adabtive</Text> Interface</Text>
+    <View className="flex gap-2">
+      <Text className="text-2xl text-white font-light">Welcome to</Text>
+      <Text className="text-4xl text-white font-light"><Text className="font-semibold">Adabtive</Text> Interface</Text>
 
-              </View>
+    </View>
 
-            </View>
-          }
-
-
+  </View>
+}
 
 
-          {
-            !isLoading &&
+{
+  isLoading &&
+  <View className="p-6 flex-1 justify-center" key="loading"
+    from={{
+      opacity: 0,
+      scale: 1.2,
+      //translateY: 10,
+    }}
+    animate={{
+      opacity: .8,
+      scale: 1,
+      //translateY: 0
+    }}
+    exit={{
+      opacity: 0,
+      scale: 1.2,
+      //translateY: 0
+    }}
+    transition={{
+      type: 'timing',
+      duration: 500,  // Duration in milliseconds
+      easing: Easing.out(Easing.quad), // Fast to slow transition
+    }}
+  >
+    <VortexSphere />
+  </View>
+}
 
-            <View key='action-button' className="w-full absolute bottom-0 p-6 items-center justify-center" style={{ marginBottom: insets.bottom }}
-              from={{
-                opacity: 0,
-                //scale: 1,
-                translateY: 20,
-              }}
-              animate={{
-                opacity: 1,
-                //scale: 1,
-                translateY: 0
-              }}
-              exit={{
-                opacity: 0,
-                //scale: 0.9,
-                translateY: 20
-              }}
-            >
-              <Pressable
-                onPress={uiData? reset:fetchDataFromAPI}
-                //onPress={() => { setIsLoading(!isLoading) }}
-                //disabled={isLoading}
-                className="bg-white/20 w-full items-center justify-center p-1 rounded-full flex-row w-80"
-              >
+{
+  !isLoading &&
+
+  <View key='action-button' className="w-full absolute bottom-0 p-6 items-center justify-center" style={{ marginBottom: insets.bottom }}
+    from={{
+      opacity: 0,
+      //scale: 1,
+      translateY: 20,
+    }}
+    animate={{
+      opacity: 1,
+      //scale: 1,
+      translateY: 0
+    }}
+    exit={{
+      opacity: 0,
+      //scale: 0.9,
+      translateY: 20
+    }}
+  >
+    <Pressable
+      onPress={uiData? reset:fetchDataFromAPI}
+      //onPress={() => { setIsLoading(!isLoading) }}
+      //disabled={isLoading}
+      className="bg-white/20 w-full items-center justify-center p-1 rounded-full flex-row w-80"
+    >
 
 
-                <View className="flex-1 items-center p-4">
-                  <Text className="text-white text-lg">{uiData? 'Start Over':'Start'}</Text>
-                </View>
+      <View className="flex-1 items-center p-4">
+        <Text className="text-white text-lg">{uiData? 'Start Over':'Start'}</Text>
+      </View>
 
-              </Pressable>
-            </View>
-          }
+    </Pressable>
+  </View>
+}
 
-          {
-            isLoading &&
-            <View className="p-6 flex-1 justify-center" key="loading"
-              from={{
-                opacity: 0,
-                scale: 1.2,
-                //translateY: 10,
-              }}
-              animate={{
-                opacity: .8,
-                scale: 1,
-                //translateY: 0
-              }}
-              exit={{
-                opacity: 0,
-                scale: 1.2,
-                //translateY: 0
-              }}
-              transition={{
-                type: 'timing',
-                duration: 500,  // Duration in milliseconds
-                easing: Easing.out(Easing.quad), // Fast to slow transition
-              }}
-            >
-              <VortexSphere />
-            </View>
-          }
+</AnimatePresence>
 
-        </AnimatePresence>
-      </SafeAreaView>
+</View>
+</ScrollView>
+
+      </View>
 
     </View>
   );
