@@ -9,7 +9,8 @@ import DynamicComponentRenderer from '@/components/DynamicComponentRenderer';
 import AnimatedGradient from "@/components/ui/AnimatedGradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Text from "@/components/ui/Text";
-import { Feather } from '@expo/vector-icons';
+import {VortexSphere} from "@/components/ui/Sphere";
+import { Easing } from "react-native-reanimated";
 
 interface ComponentData {
   // Add any specific properties your dynamic components expect
@@ -110,13 +111,15 @@ const reset = ()=>{
 
   return (
     <View className="flex-1">
-
+      
+      
 
       <View className="absolute left-0 top-0 h-full w-full  ">
         <AnimatedGradient />
       </View>
 
       <SafeAreaView className="flex-1 relative z-10">
+
 
         <AnimatePresence exitBeforeEnter>
 
@@ -217,10 +220,35 @@ const reset = ()=>{
                   <Text className="text-white text-lg">{uiData? 'Start Over':'Start'}</Text>
                 </View>
 
-                {/* <View className="bg-white/60 rounded-full p-4">
-                  <Feather name="arrow-right" color="#292929" size={20} />
-                </View> */}
               </Pressable>
+            </View>
+          }
+
+          {
+            isLoading &&
+            <View className="p-6 flex-1 justify-center" key="loading"
+              from={{
+                opacity: 0,
+                scale: 1.2,
+                //translateY: 10,
+              }}
+              animate={{
+                opacity: .8,
+                scale: 1,
+                //translateY: 0
+              }}
+              exit={{
+                opacity: 0,
+                scale: 1.2,
+                //translateY: 0
+              }}
+              transition={{
+                type: 'timing',
+                duration: 500,  // Duration in milliseconds
+                easing: Easing.out(Easing.quad), // Fast to slow transition
+              }}
+            >
+              <VortexSphere />
             </View>
           }
 
