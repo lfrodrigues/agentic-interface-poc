@@ -37,7 +37,7 @@ const reset = ()=>{
     try {
 
       setIsLoading(true);
-      const response = await fetch('https://fd30-83-110-100-187.ngrok-free.app/api/', {
+      const response = await fetch('https://fd24-217-165-28-125.ngrok-free.app/api/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ const reset = ()=>{
     setIsLoading(true);
     try {
       console.log('will handleSubmit with data', formData);
-      const response = await fetch('https://fd30-83-110-100-187.ngrok-free.app/api/', {
+      const response = await fetch('https://fd24-217-165-28-125.ngrok-free.app/api/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

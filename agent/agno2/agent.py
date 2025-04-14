@@ -106,9 +106,10 @@ def start_agent(session_id=None):
         # debug_mode=True
     )
 
+    # agent.knowledge.load(recreate=True)
+
     return agent
 
-# agent.knowledge.load(recreate=True)
 
 if __name__ == "__main__":
     start_console_tools()
