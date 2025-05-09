@@ -2,6 +2,7 @@ package com.example.mykotlinapp.network
 
 import io.ktor.client.* 
 import io.ktor.client.engine.cio.* 
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.* 
 import io.ktor.client.request.* 
 import io.ktor.client.statement.* 
@@ -30,15 +31,18 @@ data class ApiResponse(
 
 // --- Ktor HTTP Client Setup ---
 object ApiClient {
-    // Use 10.0.2.2 for Android Emulator to connect to localhost on the host machine
-    // For a real device on the same Wi-Fi, use your computer's network IP.
-    // The Ngrok URL from the Expo app: https://fd24-217-165-28-125.ngrok-free.app/api/
-    // For local development if your server is on http://localhost:3000
-//    private const val BASE_URL = "http://10.0.2.2:3000/api/" // Emulator default for localhost
-     private const val BASE_URL = "https://0b32-94-202-179-120.ngrok-free.app/api/" // ngrok URL with /api/
-//
+
+    private const val BASE_URL = "https://0b32-94-202-179-120.ngrok-free.app/api/" // ngrok URL with /api/
 
     val client = HttpClient(CIO) {
+
+        // Configure HttpTimeout plugin
+        install(HttpTimeout) {
+            requestTimeoutMillis = 60000 // Overall request timeout
+            connectTimeoutMillis = 10000 // Connection timeout
+            socketTimeoutMillis = 60000  // Socket timeout (time to wait for data after connection)
+        }
+
         install(ContentNegotiation) {
             json(Json {
                 prettyPrint = true

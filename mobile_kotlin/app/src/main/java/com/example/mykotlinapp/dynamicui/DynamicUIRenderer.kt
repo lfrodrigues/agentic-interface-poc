@@ -1,10 +1,15 @@
 package com.example.mykotlinapp.dynamicui
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
-import android.widget.TextView
+import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.serialization.json.* // For JsonElement, JsonObject, JsonArray, JsonPrimitive
 
 // Type alias for our component factory functions
@@ -19,7 +24,8 @@ typealias ComponentFactory = (
 val androidComponentMap: Map<String, ComponentFactory> = mapOf(
     "Text" to ::createTextComponent,
     "View" to ::createViewComponent, // Represents a container like LinearLayout
-    "Button" to ::createButtonComponent
+    "Button" to ::createButtonComponent,
+    "TextInput" to ::createTextInputComponent // Added TextInput
     // We'll add more components like "TextInput", "Image" later
 )
 
@@ -131,8 +137,53 @@ fun createButtonComponent(
     return button
 }
 
+fun createTextInputComponent(
+    context: Context,
+    node: ComponentNode,
+    actionHandler: (actionName: String, actionParams: Map<String, String>?) -> Unit,
+    json: Json
+): View {
+    val textInputLayout = TextInputLayout(context).apply {
+        layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        // ನೀವು ಇಲ್ಲಿ ಪ್ಯಾಡಿಂಗ್ ಅಥವಾ ಅಂಚುಗಳನ್ನು ಹೊಂದಿಸಬಹುದು
+        // setPadding(0, 8, 0, 8) // Example padding (ವಾಸ್ತವಿಕ ಮೌಲ್ಯಗಳಿಗೆ dp ಬಳಸಿ)
+    }
+
+    val editText = TextInputEditText(textInputLayout.context)
+    textInputLayout.addView(editText)
+
+    val placeholderValue = node.props?.get("placeholder")?.jsonPrimitive?.contentOrNull
+    val hintValue = node.props?.get("hint")?.jsonPrimitive?.contentOrNull
+    val labelValue = node.props?.get("label")?.jsonPrimitive?.contentOrNull
+
+    textInputLayout.hint = placeholderValue ?: hintValue ?: labelValue ?: "Enter text"
+
+    val initialValue = node.props?.get("value")?.jsonPrimitive?.contentOrNull
+    if (initialValue != null) {
+        editText.setText(initialValue)
+    }
+
+    val fieldName = node.props?.get("name")?.jsonPrimitive?.contentOrNull ?: "unknownField"
+    val onChangeTextAction = node.props?.get("onChangeText")?.jsonPrimitive?.contentOrNull
+
+    if (onChangeTextAction != null && fieldName != null) {
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Call the action handler with the action name from props and the current text
+                actionHandler(onChangeTextAction, mapOf("name" to fieldName, "value" to s.toString()))
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+    return textInputLayout
+}
+
 // TODO:
-// - Implement more component factories (TextInput, Image, etc.)
+// - Implement more component factories (Image, etc.)
 // - Add more robust props parsing (e.g., for styles, colors, dimensions, from props or "className"-like interpretation)
 // - Action handler logic refinement
 // - Error handling and logging 

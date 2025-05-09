@@ -108,8 +108,9 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
+                Log.d(TAG, "handleSubmitData - formData before serialization: $formData")
                 val formDataJsonString = jsonParser.encodeToString(formData)
-                Log.d(TAG, "Submitting formData: $formDataJsonString with sessionId: $sessionId")
+                Log.d(TAG, "Submitting formData JSON string: $formDataJsonString with sessionId: $sessionId")
                 val apiResponse = withContext(Dispatchers.IO) {
                     ApiClient.submitData(sessionId, formDataJsonString)
                 }

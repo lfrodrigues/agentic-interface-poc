@@ -53,7 +53,7 @@ def start_console_tools():
 # langtrace.init()
 
 knowledge_base = TextKnowledgeBase(
-    path="data/txt_files",
+    path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/txt_files"),
     # Table name: ai.text_documents
     vector_db=PgVector(
         table_name="text_documents",
@@ -67,7 +67,8 @@ knowledge_base = TextKnowledgeBase(
 def start_agent(session_id=None):
 
     # Create a storage backend using the Sqlite database
-    storage = SqliteAgentStorage(table_name="agent_sessions", db_file="tmp/data.db")
+    storage = SqliteAgentStorage(table_name="agent_sessions", 
+                                db_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "tmp/data.db"))
 
     agent = Agent(
         # model=AwsBedrock(id="us.anthropic.claude-3-7-sonnet-20250219-v1:0", temperature=0), 
@@ -76,9 +77,6 @@ def start_agent(session_id=None):
         # model=Groq(id="llama-3.3-70b-versatile"),
         # model=Groq(id="deepseek-r1-distill-llama-70b"),
         # model=Groq(id="meta-llama/llama-4-maverick-17b-128e-instruct"),
-
-        
-
         
         description=dedent("""
             You are a helpful assistant.
