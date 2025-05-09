@@ -3,7 +3,7 @@ from langtrace_python_sdk import langtrace  # Must precede other imports
 from dotenv import load_dotenv
 from agno.agent import Agent
 from agno.models.aws import AwsBedrock
-from .tools import (
+from tools import (
     get_outstanding_invoices,
     get_user_information,
     add_card,
@@ -21,6 +21,7 @@ from agno.vectordb.pgvector import PgVector
 import readline
 import os
 import atexit
+from agno.models.groq import Groq
 
 load_dotenv()
 
@@ -60,16 +61,25 @@ knowledge_base = TextKnowledgeBase(
     ),
 )
 
-# Create a storage backend using the Sqlite database
-storage = SqliteAgentStorage(table_name="agent_sessions", db_file="tmp/data.db")
+
 
 
 def start_agent(session_id=None):
+
+    # Create a storage backend using the Sqlite database
+    storage = SqliteAgentStorage(table_name="agent_sessions", db_file="tmp/data.db")
 
     agent = Agent(
         # model=AwsBedrock(id="us.anthropic.claude-3-7-sonnet-20250219-v1:0", temperature=0), 
         session_id=session_id,
         model=OpenAIChat(id="gpt-4o-mini", temperature=0),
+        # model=Groq(id="llama-3.3-70b-versatile"),
+        # model=Groq(id="deepseek-r1-distill-llama-70b"),
+        # model=Groq(id="meta-llama/llama-4-maverick-17b-128e-instruct"),
+
+        
+
+        
         description=dedent("""
             You are a helpful assistant.
             The first tool you need to call is search_knowledge_base.
@@ -103,7 +113,7 @@ def start_agent(session_id=None):
         storage=storage,
         knowledge=knowledge_base,
         search_knowledge=True,
-        # debug_mode=True
+        debug_mode=True
     )
 
     # agent.knowledge.load(recreate=True)
@@ -114,6 +124,11 @@ def start_agent(session_id=None):
 if __name__ == "__main__":
     start_console_tools()
     agent = start_agent()
+
+    # import pdb; pdb.set_trace()
+
+    # agent.knowledge.load(recreate=True)
+
     try:
         # agent.print_response("What is my credit?", stream=True)
         # agent.print_response("what is my credit?", stream=True)
