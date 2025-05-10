@@ -1,5 +1,6 @@
-import time
 import json
+import time
+
 from django.utils.deprecation import MiddlewareMixin
 
 

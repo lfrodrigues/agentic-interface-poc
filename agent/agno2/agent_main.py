@@ -1,27 +1,25 @@
+import atexit
+import os
+import readline
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.knowledge.text import TextKnowledgeBase
+from agno.models.aws import AwsBedrock
+from agno.models.groq import Groq
+from agno.models.openai import OpenAIChat
+from agno.storage.postgres import PostgresStorage
+from agno.vectordb.pgvector import PgVector
+from dotenv import load_dotenv
 from langtrace_python_sdk import langtrace  # Must precede other imports
 
-from dotenv import load_dotenv
-from agno.agent import Agent
-from agno.models.aws import AwsBedrock
-from .tools import (
-    get_outstanding_invoices,
-    get_user_information,
+from .agent_tools import (
     add_card,
     get_available_cards,
+    get_outstanding_invoices,
     make_payment,
     validate_phone_number,
-    get_available_packages,
-    activate_package,
 )
-from textwrap import dedent
-from agno.models.openai import OpenAIChat
-from agno.knowledge.text import TextKnowledgeBase
-from agno.vectordb.pgvector import PgVector
-from agno.storage.postgres import PostgresStorage
-import readline
-import os
-import atexit
-from agno.models.groq import Groq
 
 DB_URL = 'postgresql+psycopg://ai:ai@localhost:5532/ai'
 
@@ -32,7 +30,7 @@ load_dotenv()
 
 def start_console_tools():
     # Configure readline history
-    histfile = os.path.join('tmp', '.agno_history')
+    histfile = os.path.join('/tmp', '.agno_history')
     try:
         readline.read_history_file(histfile)
         # Default history len is -1 (infinite), which may grow unruly
@@ -53,26 +51,24 @@ def start_console_tools():
     readline.parse_and_bind('Control-u: unix-line-discard')  # Ctrl+u to delete to beginning of line
 
 
-knowledge_base = TextKnowledgeBase(
-    path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/txt_files'),
-    # Table name: ai.text_documents
-    vector_db=PgVector(
-        table_name='text_documents',
-        db_url=DB_URL,
-    ),
-)
-
-
-# Create a storage backend using the Postgres database
-storage = PostgresStorage(
-    # store sessions in the ai.sessions table
-    table_name='agent_sessions',
-    # db_url: Postgres database URL
-    db_url=DB_URL,
-)
-
-
 def start_agent(session_id=None):
+    knowledge_base = TextKnowledgeBase(
+        path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/txt_files'),
+        # Table name: ai.text_documents
+        vector_db=PgVector(
+            table_name='text_documents',
+            db_url=DB_URL,
+        ),
+    )
+
+    # Create a storage backend using the Postgres database
+    storage = PostgresStorage(
+        # store sessions in the ai.sessions table
+        table_name='agent_sessions',
+        # db_url: Postgres database URL
+        db_url=DB_URL,
+    )
+
     agent = Agent(
         session_id=session_id,
         model=OpenAIChat(id='gpt-4o-mini', temperature=0),
@@ -101,43 +97,20 @@ def start_agent(session_id=None):
         num_history_responses=15,
         tools=[
             get_outstanding_invoices,
-            get_user_information,
             add_card,
             get_available_cards,
             make_payment,
             validate_phone_number,
-            get_available_packages,
-            activate_package,
         ],
         show_tool_calls=True,
         markdown=True,
         storage=storage,
         knowledge=knowledge_base,
         search_knowledge=True,
-        debug_mode=True,
+        # debug_mode=True,
     )
 
+    # can use this
     # agent.knowledge.load(recreate=True)
 
     return agent
-
-
-if __name__ == '__main__':
-    start_console_tools()
-    agent = start_agent()
-
-    # agent.knowledge.load(recreate=True)
-
-    try:
-        print("Interactive Agent is ready! Type 'exit' to end the conversation.")
-        print('You can copy-paste multi-line text directly into the prompt.')
-
-        while True:
-            user_input = input('You: ')
-            if user_input.lower() == 'exit':
-                break
-            response = agent.print_response(user_input)
-            print(f'Agent: {response}')
-
-    except Exception as e:
-        print(f'Error: {str(e)}')

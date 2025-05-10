@@ -1,6 +1,7 @@
-import requests
-import json
 import argparse
+import json
+
+import requests
 
 
 def test_delete_user(customer_id):

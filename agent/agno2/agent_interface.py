@@ -1,7 +1,8 @@
-from dotenv import load_dotenv
-from agno.agent import Agent
 from textwrap import dedent
+
+from agno.agent import Agent
 from agno.models.openai import OpenAIChat
+from dotenv import load_dotenv
 
 load_dotenv()
 

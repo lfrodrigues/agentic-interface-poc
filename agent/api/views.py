@@ -1,67 +1,16 @@
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from agno2.agent import start_agent
-from agno2.interface import start_agent_jsx, start_agent_json
-from api.serializers import MessageInputSerializer, UserCreateSerializer
+import json
 import uuid
 from textwrap import dedent
-import json
-from rest_framework.views import APIView
-from rest_framework.response import Response
+
 from rest_framework import status
-from api.models import User
-from agno2.tools import get_user_information, validate_phone_number
-import random
-import string
-from faker import Faker
-from datetime import datetime, timedelta
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-fake = Faker()
-
-
-def generate_random_user_data(phone_number):
-    """Generate random user data using Faker."""
-    registration_date = fake.date_time_between(start_date='-1y', end_date='now')
-    renewal_date = registration_date + timedelta(days=365)
-
-    return json.dumps(
-        {
-            'user_profile': {
-                'customer_id': phone_number,
-                'full_name': fake.name(),
-                'email': fake.email(),
-                'account_status': fake.random_element(elements=('active', 'suspended', 'pending')),
-                'registration_date': registration_date.isoformat() + 'Z',
-            },
-            'subscription': {
-                'plan_name': fake.random_element(
-                    elements=('Basic', 'Premium', 'Premium Plus', 'Enterprise')
-                ),
-                'plan_type': fake.random_element(elements=('prepaid', 'postpaid')),
-                'start_date': registration_date.isoformat() + 'Z',
-                'renewal_date': renewal_date.isoformat() + 'Z',
-                'auto_renewal': fake.boolean(chance_of_getting_true=80),
-            },
-            'services': {
-                'voice': fake.boolean(chance_of_getting_true=90),
-                'data': fake.boolean(chance_of_getting_true=95),
-                'sms': fake.boolean(chance_of_getting_true=85),
-                'roaming': fake.boolean(chance_of_getting_true=70),
-            },
-            'billing': {
-                'billing_address': {
-                    'street': fake.street_address(),
-                    'city': fake.city(),
-                    'state': fake.state_abbr(),
-                    'zip': fake.zipcode(),
-                    'country': 'USA',
-                },
-                'payment_method': fake.random_element(elements=('credit_card')),
-                'billing_cycle': fake.random_element(elements=('monthly', 'quarterly', 'annual')),
-            },
-        }
-    )
+from agno2.agent_interface import start_agent_json, start_agent_jsx
+from agno2.agent_main import start_agent
+from agno2.models import User
+from agno2.utils import create_user
+from api.serializers import MessageInputSerializer, UserCreateSerializer, UserListSerializer
 
 
 class TalkAgentView(APIView):
@@ -137,11 +86,8 @@ class CreateUserView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Generate random user data instead of calling external service
-        user_data = generate_random_user_data(serializer.validated_data['phone_number'])
-
         # Create or update user in database
-        user = User.from_user_information(json.loads(user_data))
+        user = create_user(serializer.validated_data['phone_number'])
 
         return Response(
             {
@@ -158,9 +104,22 @@ class DeleteUserView(APIView):
     def delete(self, request, customer_id):
         try:
             user = User.objects.get(customer_id=customer_id)
+
+            # Delete all associated invoices first
+            user.invoices.all().delete()
+
+            # Delete the user
             user.delete()
+
+            # Delete the billing address since it's not needed
+            billing_address = user.billing_address
+            billing_address.delete()
+
             return Response(
-                {'message': 'User deleted successfully', 'customer_id': customer_id},
+                {
+                    'message': 'User and associated data deleted successfully',
+                    'customer_id': customer_id,
+                },
                 status=status.HTTP_200_OK,
             )
         except User.DoesNotExist:
@@ -168,8 +127,10 @@ class DeleteUserView(APIView):
                 {'message': f'User with customer_id {customer_id} not found'},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        except Exception as e:
-            return Response(
-                {'message': f'Error deleting user: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+
+
+class ListUsersView(APIView):
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserListSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

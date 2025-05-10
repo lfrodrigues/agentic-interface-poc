@@ -97,3 +97,85 @@ class User(models.Model):
             },
         )
         return user
+
+
+class Invoice(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+        ('overdue', 'Overdue'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    invoice_id = models.CharField(max_length=50, unique=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='invoices')
+    issue_date = models.DateTimeField()
+    due_date = models.DateTimeField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'invoices'
+        indexes = [
+            models.Index(fields=['invoice_id']),
+            models.Index(fields=['user', 'status']),
+            models.Index(fields=['due_date']),
+        ]
+
+    def __str__(self):
+        return f'{self.invoice_id} - {self.amount} ({self.status})'
+
+    @classmethod
+    def from_invoice_data(cls, user: User, invoice_data: dict):
+        """
+        Create or update an Invoice instance from the invoice data
+        """
+        invoice, created = cls.objects.update_or_create(
+            invoice_id=invoice_data['invoice_id'],
+            defaults={
+                'user': user,
+                'issue_date': invoice_data['issue_date'],
+                'due_date': invoice_data['due_date'],
+                'amount': invoice_data['amount'],
+                'status': invoice_data['status'],
+                'description': invoice_data['description'],
+            },
+        )
+        return invoice
+
+
+class PaymentCard(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payment_cards')
+    card_number = models.CharField(max_length=19) 
+    expiration_date = models.DateField()
+    payment_method_id = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'payment_cards'
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['payment_method_id']),
+        ]
+
+    def __str__(self):
+        return f'Card ending in {self.card_number[-4:]}'
+
+    @classmethod
+    def from_payment_data(cls, user: User, payment_data: dict):
+        """
+        Create or update a PaymentCard instance from payment data
+        """
+        card, created = cls.objects.update_or_create(
+            payment_method_id=payment_data['payment_method_id'],
+            defaults={
+                'user': user,
+                'card_number': payment_data['card_number'],
+                'expiration_date': payment_data['expiration_date']
+            },
+        )
+        return card

@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
                     'billing_address',
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
-                        to='api.billingaddress',
+                        to='agno2.billingaddress',
                     ),
                 ),
             ],
