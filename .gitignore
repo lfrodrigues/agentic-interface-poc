@@ -54,3 +54,5 @@ ENV/
 .agno_history
 data.db
 db.sqlite3
+
+uv.lock
