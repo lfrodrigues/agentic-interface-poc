@@ -3,7 +3,7 @@ from langtrace_python_sdk import langtrace  # Must precede other imports
 from dotenv import load_dotenv
 from agno.agent import Agent
 from agno.models.aws import AwsBedrock
-from tools import (
+from .tools import (
     get_outstanding_invoices,
     get_user_information,
     add_card,
@@ -26,6 +26,8 @@ from agno.models.groq import Groq
 DB_URL = "postgresql+psycopg://ai:ai@localhost:5532/ai"
 
 load_dotenv()
+
+# langtrace.init()
 
 def start_console_tools():
     # Configure readline history
@@ -51,8 +53,6 @@ def start_console_tools():
         "Control-u: unix-line-discard"
     )  # Ctrl+u to delete to beginning of line
 
-
-# langtrace.init()
 
 knowledge_base = TextKnowledgeBase(
     path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/txt_files"),
@@ -130,14 +130,9 @@ if __name__ == "__main__":
     start_console_tools()
     agent = start_agent()
 
-    # import pdb; pdb.set_trace()
-
     # agent.knowledge.load(recreate=True)
 
     try:
-        # agent.print_response("What is my credit?", stream=True)
-        # agent.print_response("what is my credit?", stream=True)
-
         print("Interactive Agent is ready! Type 'exit' to end the conversation.")
         print("You can copy-paste multi-line text directly into the prompt.")
 
@@ -145,7 +140,6 @@ if __name__ == "__main__":
             user_input = input("You: ")
             if user_input.lower() == "exit":
                 break
-            # response = agent.print_response(user_input, stream=True)
             response = agent.print_response(user_input)
             print(f"Agent: {response}")
 

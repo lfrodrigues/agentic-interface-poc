@@ -2,4 +2,7 @@ from rest_framework import serializers
 
 class MessageInputSerializer(serializers.Serializer):
     message = serializers.CharField(required=True)
-    session_id = serializers.CharField(required=False) 
+    session_id = serializers.CharField(required=False)
+
+class UserCreateSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(required=True)

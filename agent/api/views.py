@@ -3,10 +3,60 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from agno2.agent import start_agent
 from agno2.interface import start_agent_jsx, start_agent_json
-from .serializers import MessageInputSerializer
+from api.serializers import MessageInputSerializer, UserCreateSerializer
 import uuid
 from textwrap import dedent
 import json
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from api.models import User
+from agno2.tools import get_user_information, validate_phone_number
+import random
+import string
+from faker import Faker
+from datetime import datetime, timedelta
+
+fake = Faker()
+
+def generate_random_user_data(phone_number):
+    """Generate random user data using Faker."""
+    registration_date = fake.date_time_between(start_date='-1y', end_date='now')
+    renewal_date = registration_date + timedelta(days=365)
+    
+    return json.dumps({
+        'user_profile': {
+            'customer_id': phone_number,
+            'full_name': fake.name(),
+            'email': fake.email(),
+            'account_status': fake.random_element(elements=('active', 'suspended', 'pending')),
+            'registration_date': registration_date.isoformat() + 'Z',
+        },
+        'subscription': {
+            'plan_name': fake.random_element(elements=('Basic', 'Premium', 'Premium Plus', 'Enterprise')),
+            'plan_type': fake.random_element(elements=('prepaid', 'postpaid')),
+            'start_date': registration_date.isoformat() + 'Z',
+            'renewal_date': renewal_date.isoformat() + 'Z',
+            'auto_renewal': fake.boolean(chance_of_getting_true=80),
+        },
+        'services': {
+            'voice': fake.boolean(chance_of_getting_true=90),
+            'data': fake.boolean(chance_of_getting_true=95),
+            'sms': fake.boolean(chance_of_getting_true=85),
+            'roaming': fake.boolean(chance_of_getting_true=70),
+        },
+        'billing': {
+            'billing_address': {
+                'street': fake.street_address(),
+                'city': fake.city(),
+                'state': fake.state_abbr(),
+                'zip': fake.zipcode(),
+                'country': 'USA',
+            },
+            'payment_method': fake.random_element(elements=('credit_card')),
+            'billing_cycle': fake.random_element(elements=('monthly', 'quarterly', 'annual')),
+        }
+    })
 
 class TalkAgentView(APIView):
     """
@@ -63,19 +113,24 @@ class TalkAgentView(APIView):
 
 
 
-# {
-#     "message": " I want to pay my invoices",
-#     "session_id": "NEW"
-# }
 
+class CreateUserView(APIView):
+    def post(self, request):
+        serializer = UserCreateSerializer(data=request.data)
+        
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# {
-#     "message": " I want to pay my invoices",
-#     "session_id": "session_2"
-# }
-
-
-# {
-#     "message": " +123456543",
-#     "session_id": "session_2"
-# }
+        # Generate random user data instead of calling external service
+        user_data = generate_random_user_data(serializer.validated_data['phone_number'])
+        
+        # Create or update user in database
+        user = User.from_user_information(json.loads(user_data))
+        
+        return Response({
+            "message": "User created successfully",
+            "customer_id": user.customer_id,
+            "full_name": user.full_name,
+            "email": user.email
+        }, status=status.HTTP_201_CREATED)
+            
