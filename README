@@ -1,4 +1,6 @@
-# INSTALL BACKEND 
+# RUN BACKEND
+
+$ cd agent
 
 $ python3 -m venv venv 
 
@@ -6,9 +8,7 @@ $ source venv/bin/activate
 
 $ pip install uv
 
-$ uv pip install -r agent/requirements.txt
-
-$ cd agent 
+$ uv sync --active
 
 $ cp agno2/.env_template  agno2/.env
 

@@ -32,7 +32,7 @@ data class ApiResponse(
 // --- Ktor HTTP Client Setup ---
 object ApiClient {
 
-    private const val BASE_URL = "https://0b32-94-202-179-120.ngrok-free.app/api/" // ngrok URL with /api/
+    private const val BASE_URL = "https://0b32-94-202-179-120.ngrok-free.app/api/talk/" // ngrok URL with /api/
 
     val client = HttpClient(CIO) {
 

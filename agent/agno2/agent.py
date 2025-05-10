@@ -23,15 +23,16 @@ import os
 import atexit
 from agno.models.groq import Groq
 
-DB_URL = "postgresql+psycopg://ai:ai@localhost:5532/ai"
+DB_URL = 'postgresql+psycopg://ai:ai@localhost:5532/ai'
 
 load_dotenv()
 
 # langtrace.init()
 
+
 def start_console_tools():
     # Configure readline history
-    histfile = os.path.join("tmp", ".agno_history")
+    histfile = os.path.join('tmp', '.agno_history')
     try:
         readline.read_history_file(histfile)
         # Default history len is -1 (infinite), which may grow unruly
@@ -43,22 +44,20 @@ def start_console_tools():
     atexit.register(readline.write_history_file, histfile)
 
     # Configure readline behavior
-    readline.parse_and_bind("tab: complete")  # Enable tab completion
-    readline.parse_and_bind("set editing-mode emacs")  # Use emacs-style editing
-    readline.parse_and_bind("Control-a: beginning-of-line")  # Ctrl+a to beginning of line
-    readline.parse_and_bind("Control-e: end-of-line")  # Ctrl+e to end of line
-    readline.parse_and_bind("Control-l: clear-screen")  # Ctrl+l to clear screen
-    readline.parse_and_bind("Control-k: kill-line")  # Ctrl+k to delete to end of line
-    readline.parse_and_bind(
-        "Control-u: unix-line-discard"
-    )  # Ctrl+u to delete to beginning of line
+    readline.parse_and_bind('tab: complete')  # Enable tab completion
+    readline.parse_and_bind('set editing-mode emacs')  # Use emacs-style editing
+    readline.parse_and_bind('Control-a: beginning-of-line')  # Ctrl+a to beginning of line
+    readline.parse_and_bind('Control-e: end-of-line')  # Ctrl+e to end of line
+    readline.parse_and_bind('Control-l: clear-screen')  # Ctrl+l to clear screen
+    readline.parse_and_bind('Control-k: kill-line')  # Ctrl+k to delete to end of line
+    readline.parse_and_bind('Control-u: unix-line-discard')  # Ctrl+u to delete to beginning of line
 
 
 knowledge_base = TextKnowledgeBase(
-    path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/txt_files"),
+    path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/txt_files'),
     # Table name: ai.text_documents
     vector_db=PgVector(
-        table_name="text_documents",
+        table_name='text_documents',
         db_url=DB_URL,
     ),
 )
@@ -67,24 +66,21 @@ knowledge_base = TextKnowledgeBase(
 # Create a storage backend using the Postgres database
 storage = PostgresStorage(
     # store sessions in the ai.sessions table
-    table_name="agent_sessions",
+    table_name='agent_sessions',
     # db_url: Postgres database URL
     db_url=DB_URL,
 )
 
 
 def start_agent(session_id=None):
-
     agent = Agent(
         session_id=session_id,
-        model=OpenAIChat(id="gpt-4o-mini", temperature=0),
+        model=OpenAIChat(id='gpt-4o-mini', temperature=0),
         # Other models we can potentially us
-
-        # model=AwsBedrock(id="us.anthropic.claude-3-7-sonnet-20250219-v1:0", temperature=0), 
+        # model=AwsBedrock(id="us.anthropic.claude-3-7-sonnet-20250219-v1:0", temperature=0),
         # model=Groq(id="llama-3.3-70b-versatile"),
         # model=Groq(id="deepseek-r1-distill-llama-70b"),
         # model=Groq(id="meta-llama/llama-4-maverick-17b-128e-instruct"),
-        
         description=dedent("""
             You are a helpful assistant.
             The first tool you need to call is search_knowledge_base.
@@ -118,7 +114,7 @@ def start_agent(session_id=None):
         storage=storage,
         knowledge=knowledge_base,
         search_knowledge=True,
-        debug_mode=True
+        debug_mode=True,
     )
 
     # agent.knowledge.load(recreate=True)
@@ -126,7 +122,7 @@ def start_agent(session_id=None):
     return agent
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     start_console_tools()
     agent = start_agent()
 
@@ -134,14 +130,14 @@ if __name__ == "__main__":
 
     try:
         print("Interactive Agent is ready! Type 'exit' to end the conversation.")
-        print("You can copy-paste multi-line text directly into the prompt.")
+        print('You can copy-paste multi-line text directly into the prompt.')
 
         while True:
-            user_input = input("You: ")
-            if user_input.lower() == "exit":
+            user_input = input('You: ')
+            if user_input.lower() == 'exit':
                 break
             response = agent.print_response(user_input)
-            print(f"Agent: {response}")
+            print(f'Agent: {response}')
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f'Error: {str(e)}')

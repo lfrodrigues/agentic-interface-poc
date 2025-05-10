@@ -36,7 +36,7 @@ class UIStateProvider extends ChangeNotifier {
     try {
       setLoading(true);
       final response = await http.post(
-        Uri.parse('https://fd24-217-165-28-125.ngrok-free.app/api/'),
+        Uri.parse('https://fd24-217-165-28-125.ngrok-free.app/api/talk/'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'message': 'NEW',
@@ -64,7 +64,7 @@ class UIStateProvider extends ChangeNotifier {
     try {
       setLoading(true);
       final response = await http.post(
-        Uri.parse('https://fd24-217-165-28-125.ngrok-free.app/api/'),
+        Uri.parse('https://fd24-217-165-28-125.ngrok-free.app/api/talk/'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'session_id': _sessionId,

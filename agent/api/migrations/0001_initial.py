@@ -5,17 +5,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
             name='BillingAddress',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('street', models.CharField(max_length=255)),
                 ('city', models.CharField(max_length=100)),
                 ('state', models.CharField(max_length=100)),
@@ -26,7 +32,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='User',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('customer_id', models.CharField(max_length=50, unique=True)),
                 ('full_name', models.CharField(max_length=255)),
                 ('email', models.EmailField(max_length=254, unique=True)),
@@ -45,11 +59,20 @@ class Migration(migrations.Migration):
                 ('billing_cycle', models.CharField(max_length=50)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('billing_address', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='api.billingaddress')),
+                (
+                    'billing_address',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to='api.billingaddress',
+                    ),
+                ),
             ],
             options={
                 'db_table': 'users',
-                'indexes': [models.Index(fields=['email'], name='users_email_4b85f2_idx'), models.Index(fields=['customer_id'], name='users_custome_e6ad80_idx')],
+                'indexes': [
+                    models.Index(fields=['email'], name='users_email_4b85f2_idx'),
+                    models.Index(fields=['customer_id'], name='users_custome_e6ad80_idx'),
+                ],
             },
         ),
     ]

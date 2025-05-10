@@ -10,7 +10,7 @@ class BillingAddress(models.Model):
     country = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.street}, {self.city}, {self.state}"
+        return f'{self.street}, {self.city}, {self.state}'
 
 
 class User(models.Model):
@@ -51,7 +51,7 @@ class User(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.full_name} ({self.user_id})"
+        return f'{self.full_name} ({self.user_id})'
 
     @classmethod
     def from_user_information(cls, user_data: dict):
@@ -71,12 +71,12 @@ class User(models.Model):
                 'state': billing['billing_address']['state'],
                 'zip': billing['billing_address']['zip'],
                 'country': billing['billing_address']['country'],
-            }
+            },
         )
 
         # Create or update user
         user, created = cls.objects.update_or_create(
-            customer_id = profile['customer_id'],
+            customer_id=profile['customer_id'],
             defaults={
                 'full_name': profile['full_name'],
                 'email': profile['email'],
@@ -94,6 +94,6 @@ class User(models.Model):
                 'payment_method': billing['payment_method'],
                 'billing_cycle': billing['billing_cycle'],
                 'billing_address': billing_address,
-            }
+            },
         )
-        return user 
+        return user

@@ -5,11 +5,11 @@ from agno.models.openai import OpenAIChat
 
 load_dotenv()
 
-def start_agent_jsx(session_id=None):
 
+def start_agent_jsx(session_id=None):
     agent = Agent(
         # model=AwsBedrock(id="anthropic.claude-3-haiku-20240307-v1:0", temperature=0),
-        model=OpenAIChat(id="gpt-4o-mini", temperature=0),
+        model=OpenAIChat(id='gpt-4o-mini', temperature=0),
         description=dedent("""
             You are a helpful assistant that converts text to a nice looking React Native JSX interface.
         """),
@@ -26,13 +26,13 @@ def start_agent_jsx(session_id=None):
         """),
         # debug_mode=True
     )
-    return agent 
+    return agent
+
 
 def start_agent_json(session_id=None):
-
     agent = Agent(
         # model=AwsBedrock(id="anthropic.claude-3-haiku-20240307-v1:0", temperature=0),
-        model=OpenAIChat(id="gpt-4o-mini", temperature=0),
+        model=OpenAIChat(id='gpt-4o-mini', temperature=0),
         description=dedent("""
             You are a helpful assistant that converts JSX to a JSON object.
         """),
@@ -227,9 +227,10 @@ def start_agent_json(session_id=None):
         """),
         # debug_mode=True
     )
-    return agent 
+    return agent
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     try:
         agent_jsx = start_agent_jsx()
         input = dedent("""
@@ -249,4 +250,4 @@ if __name__ == "__main__":
         agent_jsx.print_response(input, stream=True)
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f'Error: {str(e)}')
