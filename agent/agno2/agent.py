@@ -3,7 +3,7 @@ from langtrace_python_sdk import langtrace  # Must precede other imports
 from dotenv import load_dotenv
 from agno.agent import Agent
 from agno.models.aws import AwsBedrock
-from .tools import (
+from tools import (
     get_outstanding_invoices,
     get_user_information,
     add_card,
@@ -13,15 +13,17 @@ from .tools import (
     get_available_packages,
     activate_package,
 )
-from agno.storage.agent.sqlite import SqliteAgentStorage
 from textwrap import dedent
 from agno.models.openai import OpenAIChat
 from agno.knowledge.text import TextKnowledgeBase
 from agno.vectordb.pgvector import PgVector
+from agno.storage.postgres import PostgresStorage
 import readline
 import os
 import atexit
 from agno.models.groq import Groq
+
+DB_URL = "postgresql+psycopg://ai:ai@localhost:5532/ai"
 
 load_dotenv()
 
@@ -57,23 +59,28 @@ knowledge_base = TextKnowledgeBase(
     # Table name: ai.text_documents
     vector_db=PgVector(
         table_name="text_documents",
-        db_url="postgresql+psycopg://ai:ai@localhost:5532/ai",
+        db_url=DB_URL,
     ),
 )
 
 
+# Create a storage backend using the Postgres database
+storage = PostgresStorage(
+    # store sessions in the ai.sessions table
+    table_name="agent_sessions",
+    # db_url: Postgres database URL
+    db_url=DB_URL,
+)
 
 
 def start_agent(session_id=None):
 
-    # Create a storage backend using the Sqlite database
-    storage = SqliteAgentStorage(table_name="agent_sessions", 
-                                db_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "tmp/data.db"))
-
     agent = Agent(
-        # model=AwsBedrock(id="us.anthropic.claude-3-7-sonnet-20250219-v1:0", temperature=0), 
         session_id=session_id,
         model=OpenAIChat(id="gpt-4o-mini", temperature=0),
+        # Other models we can potentially us
+
+        # model=AwsBedrock(id="us.anthropic.claude-3-7-sonnet-20250219-v1:0", temperature=0), 
         # model=Groq(id="llama-3.3-70b-versatile"),
         # model=Groq(id="deepseek-r1-distill-llama-70b"),
         # model=Groq(id="meta-llama/llama-4-maverick-17b-128e-instruct"),
