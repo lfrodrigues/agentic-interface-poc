@@ -1,6 +1,5 @@
 # RUN BACKEND
 
-$ cd agent
 
 $ python3 -m venv venv 
 
@@ -8,7 +7,9 @@ $ source venv/bin/activate
 
 $ pip install uv
 
-$ uv sync --active
+$ uv pip install -r agent/pyproject.toml
+
+$ cd agent
 
 $ cp agno2/.env_template  agno2/.env
 
@@ -18,7 +19,11 @@ $ ./manage.py migrate
 
 $ ./manage.py runserver 0.0.0.0:8000
 
-# INSTALL FRONTEND
+# RUN AGENT INTERACTIVE 
+
+$ ./manage.py interactive_agent
+
+# INSTALL FRONTEND EXPO
 
 cd mobile-app/
 
@@ -27,3 +32,10 @@ npm install
 npm run android
 
 
+# CREATE USERS 
+
+python3 scripts/test_create_user.py
+
+# DELETE USER
+
+python3 scripts/test_delete_user.py
