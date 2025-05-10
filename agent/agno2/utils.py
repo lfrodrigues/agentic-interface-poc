@@ -5,6 +5,48 @@ from faker import Faker
 fake = Faker()
 
 
+def generate_invoice_data(user, status='overdue'):
+    """
+    Generate random invoice data for a user.
+
+    Args:
+        user (User): The user to create the invoice for
+        status (str): The status of the invoice (pending, paid, overdue, cancelled)
+
+    Returns:
+        dict: Randomly generated invoice data
+    """
+    # Generate random dates
+    issue_date = fake.date_time_between(start_date='-30d', end_date='now')
+    due_date = issue_date + timedelta(days=30)
+
+    # Generate random amount between 50 and 500
+    amount = fake.random_int(min=50, max=500)
+
+    # Generate random description
+    descriptions = [
+        f'Monthly subscription for {user.plan_name} plan',
+        f'Data usage charges for {fake.month()}',
+        f'International calls and roaming charges',
+        f'Additional services and features',
+        f'Device installment payment',
+        f'Premium content subscription',
+        f'Service activation fee',
+        f'Equipment upgrade fee',
+    ]
+
+    invoice_data = {
+        'invoice_id': f'INV-{fake.uuid4()}',
+        'issue_date': issue_date.isoformat() + 'Z',
+        'due_date': due_date.isoformat() + 'Z',
+        'amount': amount,
+        'status': status,
+        'description': fake.random_element(elements=descriptions),
+    }
+
+    return invoice_data
+
+
 def create_user(phone_number: str):
     """
     Create or update a user in the database with randomly generated data.
@@ -62,17 +104,7 @@ def create_user(phone_number: str):
     user = User.from_user_information(user_data)
 
     # Create an invoice for the user
-    issue_date = fake.date_time_between(start_date='-30d', end_date='now')
-    due_date = issue_date + timedelta(days=30)
-
-    invoice_data = {
-        'invoice_id': f'INV-{fake.uuid4()}',
-        'issue_date': issue_date.isoformat() + 'Z',
-        'due_date': due_date.isoformat() + 'Z',
-        'amount': 89.99,
-        'status': 'overdue',
-        'description': f'Invoice for {user_data["subscription"]["plan_name"]} plan',
-    }
+    invoice_data = generate_invoice_data(user, status='overdue')
 
     invoice = Invoice.from_invoice_data(user, invoice_data)
 

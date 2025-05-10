@@ -24,6 +24,7 @@ def start_agent_jsx(session_id=None):
             7. If you need to add a submit button, use the handleSubmit function
             8. Always include a prop called name when the widget is a TextInput
             9. Always include onChangeText in TextInput, use the function "storeData"
+            10. Never put <Text> inside <Text> like this  <Text>The phone number <Text style={{ fontWeight: 'bold' }}>+10346431055</Text> is valid.</Text>
         """),
         # debug_mode=True
     )

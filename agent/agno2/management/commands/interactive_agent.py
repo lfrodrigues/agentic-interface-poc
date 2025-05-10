@@ -32,14 +32,23 @@ class Command(BaseCommand):
         readline.parse_and_bind('Control-e: end-of-line')  # Ctrl+e to end of line
         readline.parse_and_bind('Control-l: clear-screen')  # Ctrl+l to clear screen
         readline.parse_and_bind('Control-k: kill-line')  # Ctrl+k to delete to end of line
-        readline.parse_and_bind('Control-u: unix-line-discard')  # Ctrl+u to delete to beginning of line
+        readline.parse_and_bind(
+            'Control-u: unix-line-discard'
+        )  # Ctrl+u to delete to beginning of line
 
     def handle(self, *args, **options):
         self.configure_console_tools()
         agent = start_agent()
 
+        # can use this
+        agent.knowledge.load(recreate=True)
+
         try:
-            self.stdout.write(self.style.SUCCESS("Interactive Agent is ready! Type 'exit' to end the conversation."))
+            self.stdout.write(
+                self.style.SUCCESS(
+                    "Interactive Agent is ready! Type 'exit' to end the conversation."
+                )
+            )
             self.stdout.write('You can copy-paste multi-line text directly into the prompt.')
 
             while True:
@@ -50,4 +59,4 @@ class Command(BaseCommand):
                 self.stdout.write(f'Agent: {response}')
 
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f'Error: {str(e)}')) 
+            self.stdout.write(self.style.ERROR(f'Error: {str(e)}'))

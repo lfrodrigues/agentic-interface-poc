@@ -13,6 +13,7 @@ Process Name: Pay an invoice
     - If there are no registered cards method ask user the full card details
     - Store the card number and expiration date in the database 
 
-3. Pay the invoice
+4. Pay the invoice
+    - If you called the tool add_card, ask the user to confirm if you can charge the card
     - Call the process payment system with the card identification and invoice number
 

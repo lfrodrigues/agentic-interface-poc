@@ -9,8 +9,8 @@ def test_delete_user(customer_id):
     url = f'http://localhost:8000/api/users/delete/{customer_id}/'
 
     try:
-        # Make the DELETE request
-        response = requests.delete(url)
+        # Make the POST request
+        response = requests.post(url)
 
         # Print the response
         print(f'\nCustomer ID: {customer_id}')

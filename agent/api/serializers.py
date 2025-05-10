@@ -30,3 +30,7 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['customer_id', 'full_name', 'email', 'invoices', 'payment_cards']
+
+
+class InvoiceCreateSerializer(serializers.Serializer):
+    customer_id = serializers.CharField(required=True)

@@ -4,6 +4,7 @@ from datetime import datetime
 
 from agno2.models import Invoice, User, PaymentCard  # Import PaymentCard model
 
+
 def get_outstanding_invoices(user_id: str) -> dict:
     """
     Use this function to get information about outstanding invoices from the telco billing system.
@@ -74,10 +75,10 @@ def get_available_cards(user_id: str) -> dict:
     try:
         # Get the user
         user = User.objects.get(customer_id=user_id)
-        
+
         # Get all payment cards for the user
         payment_cards = PaymentCard.objects.filter(user=user)
-        
+
         payment_methods = [
             {
                 'card_number': card.card_number,
@@ -112,16 +113,16 @@ def add_card(user_id: str, card_number: str, expiration_date: str) -> dict:
     try:
         # Get the user
         user = User.objects.get(customer_id=user_id)
-        
+
         # Parse expiration date
         exp_date = datetime.strptime(expiration_date, '%m/%Y').date()
-        
+
         # Create new payment card
         payment_card = PaymentCard.objects.create(
             user=user,
             card_number=card_number,
             expiration_date=exp_date,
-            payment_method_id=f'card_{uuid.uuid4().hex[:8]}'
+            payment_method_id=f'card_{uuid.uuid4().hex[:8]}',
         )
 
         return json.dumps(
@@ -177,7 +178,7 @@ def make_payment(user_id: str, invoice_id: str, payment_method_id: str = None) -
 
         # Find the invoice for the user
         invoice = Invoice.objects.get(invoice_id=invoice_id, user=user)
-        
+
         # Update the invoice status
         invoice.status = 'paid'
         invoice.save()
@@ -232,7 +233,7 @@ def validate_phone_number(phone_number: str) -> dict:
 
         # Check if user exists in database
         User.objects.get(customer_id=phone_number)
-        
+
         return json.dumps(
             {
                 'status': 'success',

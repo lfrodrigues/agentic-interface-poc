@@ -110,7 +110,4 @@ def start_agent(session_id=None):
         # debug_mode=True,
     )
 
-    # can use this
-    # agent.knowledge.load(recreate=True)
-
     return agent

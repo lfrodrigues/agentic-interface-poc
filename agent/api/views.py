@@ -1,6 +1,7 @@
 import json
 import uuid
 from textwrap import dedent
+from datetime import timezone
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -8,9 +9,14 @@ from rest_framework.views import APIView
 
 from agno2.agent_interface import start_agent_json, start_agent_jsx
 from agno2.agent_main import start_agent
-from agno2.models import User
-from agno2.utils import create_user
-from api.serializers import MessageInputSerializer, UserCreateSerializer, UserListSerializer
+from agno2.models import User, Invoice
+from agno2.utils import create_user, generate_invoice_data
+from api.serializers import (
+    MessageInputSerializer,
+    UserCreateSerializer,
+    UserListSerializer,
+    InvoiceCreateSerializer,
+)
 
 
 class TalkAgentView(APIView):
@@ -101,7 +107,7 @@ class CreateUserView(APIView):
 
 
 class DeleteUserView(APIView):
-    def delete(self, request, customer_id):
+    def post(self, request, customer_id):
         try:
             user = User.objects.get(customer_id=customer_id)
 
@@ -134,3 +140,39 @@ class ListUsersView(APIView):
         users = User.objects.all()
         serializer = UserListSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateInvoiceView(APIView):
+    def post(self, request):
+        serializer = InvoiceCreateSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(customer_id=serializer.validated_data['customer_id'])
+
+            # Generate random invoice data
+            invoice_data = generate_invoice_data(user, status='overdue')
+
+            # Create invoice
+            invoice = Invoice.from_invoice_data(user, invoice_data)
+
+            return Response(
+                {
+                    'message': 'Invoice created successfully',
+                    'invoice_id': invoice.invoice_id,
+                    'amount': invoice.amount,
+                    'due_date': invoice.due_date,
+                    'status': invoice.status,
+                    'description': invoice.description,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+        except User.DoesNotExist:
+            return Response(
+                {
+                    'message': f'User with customer_id {serializer.validated_data["customer_id"]} not found'
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )

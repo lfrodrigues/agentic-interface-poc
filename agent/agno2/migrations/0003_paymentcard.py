@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('agno2', '0002_invoice'),
     ]
@@ -14,17 +13,34 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PaymentCard',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    ),
+                ),
                 ('card_number', models.CharField(max_length=19)),
                 ('expiration_date', models.DateField()),
                 ('payment_method_id', models.CharField(max_length=100, unique=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payment_cards', to='agno2.user')),
+                (
+                    'user',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='payment_cards',
+                        to='agno2.user',
+                    ),
+                ),
             ],
             options={
                 'db_table': 'payment_cards',
-                'indexes': [models.Index(fields=['user'], name='payment_car_user_id_dea6c7_idx'), models.Index(fields=['payment_method_id'], name='payment_car_payment_cbf7d6_idx')],
+                'indexes': [
+                    models.Index(fields=['user'], name='payment_car_user_id_dea6c7_idx'),
+                    models.Index(
+                        fields=['payment_method_id'], name='payment_car_payment_cbf7d6_idx'
+                    ),
+                ],
             },
         ),
     ]

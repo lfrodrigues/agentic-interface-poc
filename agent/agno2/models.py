@@ -149,7 +149,7 @@ class Invoice(models.Model):
 
 class PaymentCard(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payment_cards')
-    card_number = models.CharField(max_length=19) 
+    card_number = models.CharField(max_length=19)
     expiration_date = models.DateField()
     payment_method_id = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -175,7 +175,7 @@ class PaymentCard(models.Model):
             defaults={
                 'user': user,
                 'card_number': payment_data['card_number'],
-                'expiration_date': payment_data['expiration_date']
+                'expiration_date': payment_data['expiration_date'],
             },
         )
         return card
